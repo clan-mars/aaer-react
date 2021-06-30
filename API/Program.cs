@@ -22,7 +22,6 @@ namespace API
 
            try 
            {
-               services.GetRequiredService<ILogger<Program>>().LogInformation("Dopefunk");
                var context = services.GetService<DataContext>();
                await context.Database.MigrateAsync();
                await Seed.SeedData(context);
