@@ -1,8 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 import { Pagination } from "../models/Pagination";
 
-import { Release } from "../models/Release";
-
 const baseURL = 'https://api.discogs.com/database/search?';
 axios.defaults.headers['Authorization'] = "Discogs token=mXkQzOGFjFqeXHcpRKqmUDznVJdKLUPQvPVyIdQm";
 
