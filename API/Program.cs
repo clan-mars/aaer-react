@@ -1,6 +1,8 @@
 using System;
 using System.Threading.Tasks;
+using Domain;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -13,22 +15,23 @@ namespace API
     {
         public static async Task Main(string[] args)
         {
-           var host = CreateHostBuilder(args).Build();
-           using var scope = host.Services.CreateScope();
-           var services = scope.ServiceProvider;
+            var host = CreateHostBuilder(args).Build();
+            using var scope = host.Services.CreateScope();
+            var services = scope.ServiceProvider;
 
-           try 
-           {
-               var context = services.GetService<DataContext>();
-               await context.Database.MigrateAsync();
-               await Seed.SeedData(context);
-           }
-           catch(Exception e) 
-           {
-               services.GetRequiredService<ILogger<Program>>().LogError(e.Message);
-           }
+            try
+            {
+                var context = services.GetService<DataContext>();
+                var userManager = services.GetRequiredService<UserManager<AppUser>>();
+                await context.Database.MigrateAsync();
+                await Seed.SeedData(context, userManager);
+            }
+            catch (Exception e)
+            {
+                services.GetRequiredService<ILogger<Program>>().LogError(e.Message);
+            }
 
-           await host.RunAsync();
+            await host.RunAsync();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
