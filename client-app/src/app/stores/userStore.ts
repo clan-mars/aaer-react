@@ -15,13 +15,10 @@ export default class UserStore {
         return !!this.user;
     }
 
-    login = async(creds: UserFormValues) => {
-        try{
+    login = async (creds: UserFormValues) => {
+        try {
             const user = await agent.Account.login(creds);
-            store.commonStore.setToken(user.token);
-            runInAction(() => this.user = user);
-            history.push('/activities');
-            store.modalStore.closeModal();
+            this.activateUser(user);
         } catch (error) {
             throw error;
         }
@@ -44,14 +41,18 @@ export default class UserStore {
     }
 
     register = async (creds: UserFormValues) => {
-        try {   
+        try {
             const user = await agent.Account.register(creds)
-            store.commonStore.setToken(user.token);
-            runInAction(() => this.user = user);
-            history.push('/activities');
-            store.modalStore.closeModal();
+            this.activateUser(user);
         } catch (error) {
             throw error;
         }
+    }
+
+    private activateUser = (user: User) => {
+        store.commonStore.setToken(user.token);
+        runInAction(() => this.user = user);
+        history.push('/activities');
+        store.modalStore.closeModal();
     }
 }
