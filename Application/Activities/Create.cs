@@ -28,10 +28,12 @@ namespace Application.Activities
         {
             private readonly DataContext dataContext;
             private readonly IUserAccessor userAccessor;
+            private readonly IActivityRepository activityRepository;
 
-            public Handler(DataContext dataContext, IUserAccessor userAccessor)
+            public Handler(DataContext dataContext, IUserAccessor userAccessor, IActivityRepository activityRepository)
             {
                 this.userAccessor = userAccessor;
+                this.activityRepository = activityRepository;
                 this.dataContext = dataContext;
             }
             public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
@@ -46,8 +48,7 @@ namespace Application.Activities
 
                 request.Activity.Attendees.Add(attendee);
 
-                dataContext.Activities.Add(request.Activity);
-                var result = await dataContext.SaveChangesAsync() > 0;
+                var result = await activityRepository.SaveActivity(request.Activity);
                 if (result)
                 {
                     return Result<Unit>.Success(Unit.Value);

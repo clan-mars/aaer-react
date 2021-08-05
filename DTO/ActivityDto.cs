@@ -17,5 +17,9 @@ namespace Application.Activities
         public bool IsCancelled { get; set; }
         public ICollection<Profile> Attendees { get; set; }
 
+        public bool IsGoing {get;set;}
+        public bool IsHost {get;set;}
+        public Profile Host {get;set;}
+
     }
 }

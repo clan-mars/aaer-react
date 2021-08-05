@@ -11,13 +11,6 @@ namespace API.Controllers
 {
     public class ActivitiesController : BaseApiController
     {
-
-        [HttpGet]
-        public async Task<ActionResult<List<Activity>>> GetActivities(CancellationToken ct)
-        {
-            return HandleResult(await Mediator.Send(new List.Query(), ct));
-        }
-
         [HttpGet("{id}")]
         public async Task<IActionResult> GetActivity(Guid id)
         {
@@ -47,7 +40,12 @@ namespace API.Controllers
 
         [HttpPost("{id}/attend")]
         public async Task<IActionResult> Attend(Guid id) {
-            return HandleResult(await Mediator.Send(new UpdateAttendance.Command{Id= id}));
+            return HandleResult(await Mediator.Send(new AttendActivity.Command{ActivityId = id}));
+        }
+
+        [HttpDelete("{id}/attend")]
+        public async Task<IActionResult> Unattend(Guid id) {
+            return HandleResult(await Mediator.Send(new UnattendActivity.Command{ActivityId = id}));
         }
     }
 }
