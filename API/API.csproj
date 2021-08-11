@@ -24,6 +24,8 @@
     <ProjectReference Include="..\Application\Application.csproj" />
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     <ProjectReference Include="..\DTO\DTO.csproj" />
+    <ProjectReference Include="..\Persistence\Persistence.csproj"  />
+    <ProjectReference Include="..\Mediators\Mediators.csproj"  />
   </ItemGroup>
 
 </Project>

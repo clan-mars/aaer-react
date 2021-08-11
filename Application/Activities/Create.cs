@@ -1,61 +1,35 @@
-using System.Threading;
 using System.Threading.Tasks;
-using Application.Core;
 using Application.Interfaces;
 using Domain;
-using FluentValidation;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Persistence;
+
 
 namespace Application.Activities
 {
     public class Create
     {
-        public class Command : IRequest<Result<Unit>>
+        private readonly IActivityRepository activityRepository;
+        private readonly IUserRepository userRepository;
+
+        public Create(IActivityRepository activityRepository, IUserRepository userRepository)
         {
-            public Activity Activity { get; set; }
+            this.activityRepository = activityRepository;
+            this.userRepository = userRepository;
         }
 
-        public class CommandValidator : AbstractValidator<Command>
+        public async Task<bool> PerformCreate(Activity activity)
         {
-            public CommandValidator()
+            var user = await userRepository.GetActiveUser();
+
+            var attendee = new ActivityAttendee
             {
-                RuleFor(x => x.Activity).SetValidator(new ActivityValidator());
-            }
-        }
-        public class Handler : IRequestHandler<Command, Result<Unit>>
-        {
-            private readonly DataContext dataContext;
-            private readonly IUserAccessor userAccessor;
-            private readonly IActivityRepository activityRepository;
+                AppUser = user,
+                Activity = activity,
+                IsHost = true
+            };
 
-            public Handler(DataContext dataContext, IUserAccessor userAccessor, IActivityRepository activityRepository)
-            {
-                this.userAccessor = userAccessor;
-                this.activityRepository = activityRepository;
-                this.dataContext = dataContext;
-            }
-            public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
-            {
-                var user = await dataContext.Users.FirstOrDefaultAsync(x => x.UserName == userAccessor.GetUsername());
+            activity.Attendees.Add(attendee);
 
-                var attendee = new ActivityAttendee{
-                    AppUser = user,
-                    Activity = request.Activity,
-                    IsHost = true
-                };
-
-                request.Activity.Attendees.Add(attendee);
-
-                var result = await activityRepository.SaveActivity(request.Activity);
-                if (result)
-                {
-                    return Result<Unit>.Success(Unit.Value);
-                }
-
-                return Result<Unit>.Failure("Failed to create activity");
-            }
+            return await activityRepository.SaveActivity(activity);
         }
     }
 }

@@ -68,15 +68,6 @@ export default class ActivityStore {
     }
 
     private addActivity = (activity: Activity) => {
-        /*
-        const user = store.userStore.user;
-        if (user) {
-            activity.isGoing = activity.attendees!.some(
-                a => a.username === user.username
-            );
-            activity.isHost = activity.hostUsername === user.username;
-            activity.host = activity.attendees?.find(x => x.username === activity.hostUsername);
-        }*/
         activity.date = new Date(activity.date!);
         this.activityRegistry.set(activity.id, activity);
     }
@@ -158,6 +149,7 @@ export default class ActivityStore {
             runInAction(() => {
                 this.activityRegistry.set(updatedActivity.id, updatedActivity);
                 this.selectedActivity = updatedActivity;
+                this.loading = false;
             })
 
         } catch (error) {
@@ -201,6 +193,7 @@ export default class ActivityStore {
         const attendee = new Profile(user!);
 
         try {
+            this.loading = true;
             await agent.Activities.create(activity);
             const newActivity = new Activity(activity);
             newActivity.hostUsername = user!.username;
@@ -208,8 +201,9 @@ export default class ActivityStore {
             this.addActivity(newActivity);
 
             runInAction(() => {
-                
                 this.selectedActivity = newActivity;
+                
+                this.loading = false;
             })
         } catch (error) {
             console.log(error);
@@ -220,7 +214,6 @@ export default class ActivityStore {
     }
 
     updateActivity = async (activity: Activity) => {
-        this.loading = true;
         try {
             await agent.Activities.update(activity);
             runInAction(() => {
@@ -229,7 +222,6 @@ export default class ActivityStore {
                     this.activityRegistry.set(activity.id, updatedActivity);
                     this.selectedActivity = updatedActivity;
                 }
-
             })
         } catch (error) {
             console.log(error);

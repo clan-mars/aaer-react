@@ -1,11 +1,10 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Domain;
-using System.Collections.Generic;
 using System;
-using Application.Activities;
-using System.Threading;
 using Microsoft.AspNetCore.Authorization;
+using Mediators;
+using API.Middleware;
 
 namespace API.Controllers
 {
@@ -14,13 +13,13 @@ namespace API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetActivity(Guid id)
         {
-            return HandleResult(await Mediator.Send(new Details.Query { Id = id }));
+            return await Process(new Activities.GetDetails { Id = id });
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateActivity(Activity activity)
         {
-            return HandleResult(await Mediator.Send(new Create.Command { Activity = activity }));
+            return await Process(new Activities.Create { Activity = activity });
         }
 
         [Authorize(Policy = "IsActivityHost")]
@@ -28,24 +27,24 @@ namespace API.Controllers
         public async Task<IActionResult> EditActivity(Guid id, Activity activity)
         {
             activity.Id = id;
-            return HandleResult(await Mediator.Send(new Edit.Command { Activity = activity }));
+            return await Process(new Activities.Edit { Activity = activity });
         }
 
         [Authorize(Policy = "IsActivityHost")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteActivity(Guid id)
         {
-            return HandleResult(await Mediator.Send(new Delete.Command { Id = id }));
+            return await Process(new Activities.Delete { Id = id });
         }
 
         [HttpPost("{id}/attend")]
         public async Task<IActionResult> Attend(Guid id) {
-            return HandleResult(await Mediator.Send(new AttendActivity.Command{ActivityId = id}));
+            return await Process(new Attendance.AttendRequest{ActivityId = id});
         }
 
         [HttpDelete("{id}/attend")]
         public async Task<IActionResult> Unattend(Guid id) {
-            return HandleResult(await Mediator.Send(new UnattendActivity.Command{ActivityId = id}));
+            return await Process(new Attendance.UnattendRequest{ActivityId = id});
         }
     }
 }

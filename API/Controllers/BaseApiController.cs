@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Application.Core;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -10,11 +11,17 @@ namespace API.Controllers
     public class BaseApiController : ControllerBase
     {
         private IMediator mediator;
-        protected IMediator Mediator => mediator ??= HttpContext.RequestServices.GetService<IMediator>();
+        private IMediator Mediator => mediator ??= HttpContext.RequestServices.GetService<IMediator>();
+
+        protected async Task<ActionResult> Process<T>(IRequest<Result<T>> request)
+        {
+            return HandleResult(await Mediator.Send(request));
+        }
 
         protected ActionResult HandleResult<T>(Result<T> result)
         {
-            if (result == null) {
+            if (result == null)
+            {
                 return NotFound();
             }
             if (result.IsSuccess)

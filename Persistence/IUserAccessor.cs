@@ -1,4 +1,4 @@
-namespace Application.Interfaces
+namespace Persistence.Interfaces
 {
     public interface IUserAccessor
     {

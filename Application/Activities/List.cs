@@ -2,12 +2,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using Domain;
+using Application.Interfaces;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Persistence;
 
 namespace Application.Activities
 {
@@ -17,19 +13,15 @@ namespace Application.Activities
 
         public class Handler : IRequestHandler<Query, Result<List<ActivityDto>>>
         {
-            private readonly DataContext context;
-            private readonly IMapper mapper;
-            public Handler(DataContext context, IMapper mapper)
-            {
-                this.mapper = mapper;
-                this.context = context;
+            private readonly IActivityRepository activityRepository;
 
+            public Handler(IActivityRepository activityRepository)
+            {
+                this.activityRepository = activityRepository;
             }
             public async Task<Result<List<ActivityDto>>> Handle(Query request, CancellationToken cancellationToken)
             {
-                var result = await context.Activities
-                .ProjectTo<ActivityDto>(mapper.ConfigurationProvider)
-                .ToListAsync();
+                var result = await activityRepository.ListActivities();
 
                 return Result<List<ActivityDto>>.Success(result);
             }

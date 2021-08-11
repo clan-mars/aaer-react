@@ -47,10 +47,9 @@ export default observer(function ActivityForm() {
             createActivity(newActivity).then(() => history.push(`/activities/${newActivity.id}`));
         } else {
             let newActivity = {
-                ...activity,
-                id: uuid()
+                ...activity
             };
-            updateActivity(newActivity as Activity).then(() => history.push(`/activities/${activity.id}`));
+            updateActivity(newActivity as Activity).then(() => history.push(`/activities/${newActivity.id}`));
         }
     }
 
