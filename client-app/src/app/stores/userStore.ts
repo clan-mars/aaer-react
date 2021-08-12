@@ -49,6 +49,10 @@ export default class UserStore {
         }
     }
 
+    setImage = (image: string) => {
+        this.user!.image = image;
+    } 
+
     private activateUser = (user: User) => {
         store.commonStore.setToken(user.token);
         runInAction(() => this.user = user);

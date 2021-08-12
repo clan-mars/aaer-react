@@ -2,6 +2,7 @@ import axios, { AxiosError, AxiosResponse } from "axios";
 import { toast } from "react-toastify";
 import { history } from "../..";
 import { Activity, ActivityFormValues } from "../models/Activity";
+import { Photo, Profile } from "../models/profile";
 import { User, UserFormValues } from "../models/user";
 import { store } from "../stores/store";
 
@@ -38,17 +39,17 @@ axios.interceptors.response.use(async response => {
             else if (config.method === 'get' && data.errors.hasOwnProperty('id')) {
                 history.push('/not-found');
             }
-            else if ( data.errors) {
+            else if (data.errors) {
                 const modalStateErrors = [];
                 for (const key in data.errors) {
-                    if  (data.errors[key]) {
+                    if (data.errors[key]) {
                         modalStateErrors.push(data.errors[key])
                     }
                 }
                 throw modalStateErrors.flat();
             }
-            
-            
+
+
             break;
         case 401:
             toast.error('unauthorised');
@@ -81,20 +82,34 @@ const Activities = {
     create: (activity: ActivityFormValues) => requests.post('/activities', activity),
     update: (activity: ActivityFormValues) => requests.put(`/activities/${activity.id}`, activity),
     delete: (id: string) => requests.del<void>(`/activities/${id}`),
-    attend: (id:string) => requests.post<void>(`/activities/${id}/attend`, {}),
-    unattend: (id:string) => requests.del<void>(`/activities/${id}/attend`),
-    updateHosted: (username:string, activity:Activity) => requests.put<void>(`/users/${username}/activities/${activity.id}`, activity)
+    attend: (id: string) => requests.post<void>(`/activities/${id}/attend`, {}),
+    unattend: (id: string) => requests.del<void>(`/activities/${id}/attend`),
+    updateHosted: (username: string, activity: Activity) => requests.put<void>(`/users/${username}/activities/${activity.id}`, activity)
 }
 
 const Account = {
     current: () => requests.get<User>('/account'),
     login: (user: UserFormValues) => requests.post<User>('/account/login', user),
-    register: (user:UserFormValues) => requests.post<User>('/account/register', user)
+    register: (user: UserFormValues) => requests.post<User>('/account/register', user)
+}
+
+const Profiles = {
+    get: (username: string) => requests.get<Profile>(`/profiles/${username}`),
+    uploadPhoto: (file: Blob) => {
+        let formData = new FormData();
+        formData.append('File', file);
+        return axios.post<Photo>('photos', formData, {
+            headers: { 'Content-type': 'multipart/form-data' }
+        })
+    },
+    setMainPhoto: (id:string) => requests.post(`/photos/${id}/setMain`, {}),
+    deletePhoto: (id:string) => requests.del(`/photos/${id}`)
 }
 
 const agent = {
     Activities,
-    Account
+    Account,
+    Profiles
 }
 
 export default agent;
