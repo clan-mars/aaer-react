@@ -9,6 +9,8 @@ using FluentValidation.AspNetCore;
 using API.Middleware;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using API.SignalR;
+using Microsoft.Extensions.Logging;
 
 namespace API
 {
@@ -34,6 +36,7 @@ namespace API
 
             services.AddApplicationServices(configuration);
             services.AddIdentityServices(configuration);
+            services.AddLogging();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -59,6 +62,7 @@ namespace API
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<ChatHub>("/chat");
             });
         }
     }

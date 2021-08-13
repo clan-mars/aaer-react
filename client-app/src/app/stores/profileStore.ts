@@ -88,10 +88,7 @@ export default class ProfileStore {
             if (this.profile) {
                 const refreshedProfile = await agent.Profiles.get(this.profile.username);
                 runInAction(() => {
-                    if (this.profile) {
-                        this.profile = refreshedProfile;
-                        this.loading = false;
-                    }
+                    this.profile = refreshedProfile;
                 });
             }
 
@@ -103,5 +100,33 @@ export default class ProfileStore {
             console.log(error);
             runInAction(() => this.loading = false);
         }
+    }
+
+    updateProfileContent = async (profile: Profile) => {
+        this.loading = true;
+        try {
+            await agent.Profiles.update(profile);
+            if (this.profile) {
+                const refreshedProfile = await agent.Profiles.get(this.profile.username);
+                runInAction(() => {
+                    if (this.profile) {
+                        this.profile = refreshedProfile;
+                    }
+                    this.loading = false;
+                });
+            } else {
+                runInAction(() => {
+                    this.loading = false;
+                });
+            }
+
+
+        } catch (error) {
+            console.log(error);
+            runInAction(() => {
+                this.loading = false;
+            });
+        }
+
     }
 }

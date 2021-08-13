@@ -1,4 +1,5 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
+
 import { toast } from "react-toastify";
 import { history } from "../..";
 import { Activity, ActivityFormValues } from "../models/Activity";
@@ -22,7 +23,7 @@ axios.interceptors.request.use(config => {
 
 axios.interceptors.response.use(async response => {
     try {
-        await sleep(1000);
+        await sleep(1000 * Math.random());
         return response;
     } catch (error) {
         console.log("Sleep error: " + error);
@@ -103,7 +104,8 @@ const Profiles = {
         })
     },
     setMainPhoto: (id:string) => requests.post(`/photos/${id}/setMain`, {}),
-    deletePhoto: (id:string) => requests.del(`/photos/${id}`)
+    deletePhoto: (id:string) => requests.del(`/photos/${id}`),
+    update: (profile:Profile) => requests.put(`/profiles/`, profile)
 }
 
 const agent = {

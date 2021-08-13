@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Domain;
+using DTO;
 
 namespace Application.Interfaces
 {
@@ -8,7 +9,7 @@ namespace Application.Interfaces
         Task<AppUser> GetActiveUser();
         string GetActiveUsername();
         Task<AppUser> GetActiveUserWithPhotos();
-        Task<Profile> GetProfile(string username);
+        Task<ProfileDto> GetProfile(string username);
         Task<bool> Save(AppUser user);
     }
 }

@@ -12,29 +12,6 @@ namespace Mediators
 {
     public class Activities
     {
-        public abstract class UpdateHandler<T> : IRequestHandler<T, Result<Unit>> where T : IRequest<Result<Unit>>
-        {
-            private readonly string action;
-
-            protected UpdateHandler(string action)
-            {
-                this.action = action;
-            }
-
-            public async Task<Result<Unit>> Handle(T request, CancellationToken cancellationToken)
-            {
-                var result = await DoAction(request);
-
-                if (result)
-                {
-                    return Result<Unit>.Success(Unit.Value);
-                }
-
-                return Result<Unit>.Failure($"Failed to {action} activity");
-            }
-
-            protected abstract Task<bool> DoAction(T request);
-        }
 
         public class Create : IRequest<Result<Unit>> { public Activity Activity { get; set; } }
         public class CreateHandler : UpdateHandler<Create>
@@ -128,5 +105,25 @@ namespace Mediators
                 return Result<ActivityDto>.Success(activity);
             }
         }
+
+        public class ActivityList : IRequest<Result<List<ActivityDto>>> { }
+
+        public class ListHandler : IRequestHandler<ActivityList, Result<List<ActivityDto>>>
+        {
+            private readonly IActivityRepository activityRepository;
+
+            public ListHandler(IActivityRepository activityRepository)
+            {
+                this.activityRepository = activityRepository;
+            }
+            public async Task<Result<List<ActivityDto>>> Handle(ActivityList request, CancellationToken cancellationToken)
+            {
+                var result = await new Application.Activities.List(activityRepository).GetList();
+
+                return Result<List<ActivityDto>>.Success(result);
+            }
+        }
+
+
     }
 }

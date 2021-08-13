@@ -16,7 +16,7 @@ using Persistence.Interfaces;
 namespace API.Extensions
 {
     public static class ApplicationServiceExtensions
-    {
+    { 
         public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration) {
             services.AddSwaggerGen(c =>
             {
@@ -28,18 +28,25 @@ namespace API.Extensions
             });
             services.AddCors(opt => {
                 opt.AddPolicy("CorsPolicy", policy=> {
-                    policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("http://localhost:3000");
+                    policy
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .WithOrigins("http://localhost:3000")
+                    .AllowCredentials()
+                    ;
                 });
             });
-            services.AddMediatR(typeof(List.Handler).Assembly);
+
             services.AddMediatR(typeof(Activities.CreateHandler).Assembly);
             services.AddAutoMapper(typeof(MappingProfiles).Assembly);
             services.AddScoped<IUserAccessor, UserAccessor>();
             services.AddScoped<IActivityRepository, ActivityRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ICommentRepository, CommentRepository>();
             services.AddScoped<IPhotoAccessor, PhotoAccessor>();
             services.AddScoped<IPhotoRepository, PhotoRepository>();
             services.Configure<CloudinarySettings>(configuration.GetSection("Cloudinary"));
+            services.AddSignalR();
 
             return services;
         }

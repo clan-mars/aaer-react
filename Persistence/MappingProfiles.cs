@@ -6,11 +6,11 @@ using DTO;
 
 namespace Application.Core
 {
-    public class MappingProfiles : AutoMapper.Profile
+    public class MappingProfiles : Profile
     {
         public MappingProfiles()
         {
-            CreateMap<Activity, Activity>();
+            CreateMap<Photo, PhotoDto>();
             CreateMap<Activity, ActivityDto>()
             .ForMember(d => d.HostUsername, o => o.MapFrom(s => s.Attendees.FirstOrDefault(x=> x.IsHost).AppUser.UserName));
 
@@ -21,8 +21,13 @@ namespace Application.Core
             .ForMember(d => d.Image, o => o.MapFrom(s => s.AppUser.Photos.FirstOrDefault(x => x.IsMain).Url))
             ;
 
-            CreateMap<AppUser, Domain.Profile>()
+            CreateMap<AppUser, ProfileDto>()
             .ForMember(d => d.Image, o => o.MapFrom(s => s.Photos.FirstOrDefault(x => x.IsMain).Url));
+
+            CreateMap<Comment, CommentDto>()
+            .ForMember(d => d.DisplayName, o => o.MapFrom(s => s.Author.DisplayName))
+            .ForMember(d => d.Username, o => o.MapFrom(s => s.Author.UserName))
+            .ForMember(d => d.Image, o => o.MapFrom(s => s.Author.Photos.FirstOrDefault(x => x.IsMain).Url));
         }
     }
 }

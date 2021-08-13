@@ -9,22 +9,15 @@ namespace Application.Activities
 {
     public class List
     {
-        public class Query : IRequest<Result<List<ActivityDto>>> { }
+        private readonly IActivityRepository activityRepository;
 
-        public class Handler : IRequestHandler<Query, Result<List<ActivityDto>>>
+        public List(IActivityRepository activityRepository)
         {
-            private readonly IActivityRepository activityRepository;
+            this.activityRepository = activityRepository;
+        }
 
-            public Handler(IActivityRepository activityRepository)
-            {
-                this.activityRepository = activityRepository;
-            }
-            public async Task<Result<List<ActivityDto>>> Handle(Query request, CancellationToken cancellationToken)
-            {
-                var result = await activityRepository.ListActivities();
-
-                return Result<List<ActivityDto>>.Success(result);
-            }
+        public async Task<List<ActivityDto>> GetList() {
+            return await activityRepository.ListActivities();
         }
     }
 }

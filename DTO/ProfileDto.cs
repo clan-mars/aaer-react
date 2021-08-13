@@ -8,7 +8,6 @@ namespace DTO
         public string DisplayName {get;set;}
         public string Bio { get; set; }
         public string Image { get; set; }
-
-        public ICollection<string> PhotoIds {get;set;}
+        public ICollection<PhotoDto> Photos {get;set;}
     }
 }

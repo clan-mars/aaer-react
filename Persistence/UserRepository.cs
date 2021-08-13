@@ -3,6 +3,7 @@ using Application.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Domain;
+using DTO;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Interfaces;
 
@@ -31,8 +32,8 @@ namespace Persistence
             return await context.Users.Include(p => p.Photos).FirstOrDefaultAsync(x => x.UserName == userAccessor.GetUsername());
         }
 
-        public async Task<Domain.Profile> GetProfile(string username) {
-            var user = await context.Users.ProjectTo<Domain.Profile>(mapper.ConfigurationProvider)
+        public async Task<ProfileDto> GetProfile(string username) {
+            var user = await context.Users.ProjectTo<ProfileDto>(mapper.ConfigurationProvider)
             .SingleOrDefaultAsync(x => x.Username == username);
 
             return user;
