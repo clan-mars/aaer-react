@@ -16,7 +16,7 @@ namespace Application.Activities
             this.activityRepository = activityRepository;
         }
 
-        public async Task<bool> PerformEdit(Activity activity) {
+        public async Task<bool> PerformEdit(ActivityDto activity) {
             return await activityRepository.SaveActivity(activity);
         }
     }

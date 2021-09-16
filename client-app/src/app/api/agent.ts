@@ -13,7 +13,7 @@ const sleep = (delay: number) => {
     });
 }
 
-axios.defaults.baseURL = 'https://localhost:5001/api';
+axios.defaults.baseURL = 'http://localhost:5000/api';
 
 axios.interceptors.request.use(config => {
     const token = store.commonStore.token;
@@ -105,7 +105,9 @@ const Profiles = {
     },
     setMainPhoto: (id:string) => requests.post(`/photos/${id}/setMain`, {}),
     deletePhoto: (id:string) => requests.del(`/photos/${id}`),
-    update: (profile:Profile) => requests.put(`/profiles/`, profile)
+    update: (profile:Profile) => requests.put(`/profiles/`, profile),
+    getFollowers: (id:string) => requests.get<Profile[]>(`users/${id}/followers`),
+    getFollowing: (id:string) => requests.get<Profile[]>(`users/${id}/following`)
 }
 
 const agent = {

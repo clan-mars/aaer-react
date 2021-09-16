@@ -75,7 +75,7 @@ export default observer(function ActivityDetailedChat({ activityId }: Props) {
                 <Comment.Group>
 
                     {commentStore.comments.map(comment => {
-                        return <Comment id={comment.id}>
+                        return <Comment id={comment.id} key={comment.id}>
                             <Comment.Avatar src={comment.image || '/assets/user.png'} />
                             <Comment.Content>
                                 <Comment.Author as={Link} to={`profiles/${comment.username}`}>{comment.displayName}</Comment.Author>

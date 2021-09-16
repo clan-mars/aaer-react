@@ -5,12 +5,25 @@ import { Activity, ActivityFormValues } from "../models/Activity";
 import { Profile } from "../models/profile";
 import { store } from "./store";
 
+interface ActivityState {
+    loading: boolean;
+    loadingInitial: boolean;
+    editMode: boolean;
+    selectedActivity: Activity | undefined;
+}
+
 export default class ActivityStore {
     activityRegistry = new Map<string, Activity>();
     selectedActivity: Activity | undefined = undefined;
     editMode = false;
     loading = false;
     loadingInitial = false;
+    currentState: ActivityState = {
+        editMode : false,
+        loading : false,
+        loadingInitial : false,
+        selectedActivity : undefined
+    };
 
     constructor() {
         makeAutoObservable(this)
@@ -49,7 +62,7 @@ export default class ActivityStore {
         }
     }
 
-    loadActivitiesForUser = async (username:string) => {
+    loadActivitiesForUser = async (username: string) => {
         try {
             this.setLoadingInitial(true);
             const response = await agent.Activities.listForUser(username);
@@ -81,6 +94,7 @@ export default class ActivityStore {
         if (activity) {
             runInAction(() => {
                 this.selectedActivity = activity;
+                this.currentState.selectedActivity = activity;
             });
 
             this.setLoadingInitial(false);
@@ -93,6 +107,7 @@ export default class ActivityStore {
             this.addActivity(activity);
             runInAction(() => {
                 this.selectedActivity = activity;
+                this.currentState.selectedActivity = activity;
             });
             this.setLoadingInitial(false);
             return activity;
@@ -101,7 +116,7 @@ export default class ActivityStore {
             this.setLoadingInitial(false);
         }
     }
-    
+
     attendActivity = async () => {
         return await this.doUpdate(agent.Activities.attend);
     }
@@ -120,17 +135,20 @@ export default class ActivityStore {
 
     updateCancelled = async (isCancelled: boolean) => {
         if (this.selectedActivity!.isCancelled === isCancelled) return;
+        if (this.currentState.selectedActivity!.isCancelled === isCancelled) return;
 
         this.loading = true;
         try {
             const user = store.userStore.user;
             this.selectedActivity!.isCancelled = isCancelled;
-            await agent.Activities.updateHosted(user!.username, this.selectedActivity! );
+            this.currentState.selectedActivity!.isCancelled = isCancelled;
+            await agent.Activities.updateHosted(user!.username, this.selectedActivity!);
             var updatedActivity = await agent.Activities.details(this.selectedActivity!.id);
             updatedActivity.date = new Date(updatedActivity.date!);
             runInAction(() => {
                 this.activityRegistry.set(updatedActivity.id, updatedActivity);
                 this.selectedActivity = updatedActivity;
+                this.currentState.selectedActivity = updatedActivity;
             })
 
         } catch (error) {
@@ -140,7 +158,7 @@ export default class ActivityStore {
         }
     }
 
-    doUpdate = async (callback:any) => {
+    doUpdate = async (callback: any) => {
         this.loading = true;
         try {
             await callback(this.selectedActivity!.id);
@@ -149,6 +167,8 @@ export default class ActivityStore {
             runInAction(() => {
                 this.activityRegistry.set(updatedActivity.id, updatedActivity);
                 this.selectedActivity = updatedActivity;
+                this.currentState.selectedActivity = updatedActivity;
+                this.currentState.loading = false;
                 this.loading = false;
             })
 
@@ -165,26 +185,31 @@ export default class ActivityStore {
         try {
             await agent.Activities.attend(this.selectedActivity!.id);
             runInAction(() => {
-                if (this.selectedActivity?.isGoing) {
-                    this.selectedActivity.attendees = this.selectedActivity.attendees?.filter(a => a.username !== user?.username);
-                    this.selectedActivity.isGoing = false;
+                let activity = this.currentState.selectedActivity;
+                if (activity?.isGoing) {
+                    activity.attendees = activity.attendees?.filter(a => a.username !== user?.username);
+                    activity.isGoing = false;
                 } else {
                     const attendee = new Profile(user!);
-                    this.selectedActivity?.attendees?.push(attendee);
-                    this.selectedActivity!.isGoing = true;
+                    activity?.attendees?.push(attendee);
+                    activity!.isGoing = true;
                 }
 
-                this.activityRegistry.set(this.selectedActivity!.id, this.selectedActivity!);
+                this.activityRegistry.set(activity!.id, activity!);
             })
 
         } catch (error) {
             console.log(error);
         } finally {
-            runInAction(() => this.loading = false);
+            runInAction(() => {
+                this.loading = false;
+                this.currentState.loading = false;
+            });
         }
     }
 
     setLoadingInitial = (state: boolean) => {
+        this.currentState.loadingInitial = state;
         this.loadingInitial = state;
     }
 
@@ -202,13 +227,15 @@ export default class ActivityStore {
 
             runInAction(() => {
                 this.selectedActivity = newActivity;
-                
                 this.loading = false;
+                this.currentState.selectedActivity = newActivity;
+                this.currentState.loading = false;
             })
         } catch (error) {
             console.log(error);
             runInAction(() => {
                 this.loading = false;
+                this.currentState.loading = false;
             })
         }
     }
@@ -218,7 +245,7 @@ export default class ActivityStore {
             await agent.Activities.update(activity);
             runInAction(() => {
                 if (activity.id) {
-                    let updatedActivity = {...this.getActivity(activity.id), ...activity};
+                    let updatedActivity = { ...this.getActivity(activity.id), ...activity };
                     this.activityRegistry.set(activity.id, updatedActivity);
                     this.selectedActivity = updatedActivity;
                 }
@@ -227,6 +254,7 @@ export default class ActivityStore {
             console.log(error);
             runInAction(() => {
                 this.loading = false;
+                this.currentState.loading = false;
             })
         }
     }
@@ -238,11 +266,13 @@ export default class ActivityStore {
             runInAction(() => {
                 this.activityRegistry.delete(id);
                 this.loading = false;
+                this.currentState.loading = false;
             })
         } catch (error) {
             console.log(error);
             runInAction(() => {
                 this.loading = false;
+                this.currentState.loading = false;
             })
         }
     }

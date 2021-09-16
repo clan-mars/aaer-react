@@ -33,20 +33,41 @@ namespace Persistence
             else
             {
                 mapper.Map(activity, existing);
+                existing.Category = activity.Category;
+                existing.City = activity.City;
+                existing.IsCancelled = activity.IsCancelled;
+                existing.Title = activity.Title;
+                existing.Venue = activity.Venue;
+                existing.Description = activity.Description;
+                existing.Date = activity.Date;
             }
 
             var changed = await context.SaveChangesAsync() > 0;
             return changed;
         }
 
-        public async Task<bool> PlainSave() {
+        public async Task<bool> PlainSave()
+        {
             return await context.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> SaveActivity(ActivityDto activityDto) {
-            var activity = new Activity();
-            mapper.Map(activityDto, activity);
-            return await SaveActivity(activity);
+        public async Task<bool> SaveActivity(ActivityDto activity)
+        {
+            var existing = await context.Activities.FindAsync(activity.Id);
+            if (existing == null)
+            {
+                existing = new Activity();
+            }
+
+            existing.Category = activity.Category;
+            existing.City = activity.City;
+            existing.IsCancelled = activity.IsCancelled;
+            existing.Title = activity.Title;
+            existing.Venue = activity.Venue;
+            existing.Description = activity.Description;
+            existing.Date = activity.Date;
+
+            return await SaveActivity(existing);
         }
 
         public async Task<ActivityDto> GetActivity(Guid id, string activeUsername)

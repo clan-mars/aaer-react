@@ -25,6 +25,8 @@ export default class ProfileStore {
         this.loadingProfile = true;
         try {
             const profile = await agent.Profiles.get(username);
+            profile.followers = await agent.Profiles.getFollowers(username);
+            profile.followings = await agent.Profiles.getFollowing(username);
             runInAction(() => {
                 this.profile = profile;
                 this.loadingProfile = false;
