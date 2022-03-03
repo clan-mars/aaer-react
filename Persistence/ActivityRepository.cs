@@ -9,6 +9,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Application.Interfaces;
 using DTO;
+using Persistence.Interfaces;
 
 namespace Persistence
 {
@@ -16,11 +17,13 @@ namespace Persistence
     {
         private readonly DataContext context;
         private readonly IMapper mapper;
+        private readonly IUserAccessor userAccessor;
 
-        public ActivityRepository(DataContext context, IMapper mapper)
+        public ActivityRepository(DataContext context, IMapper mapper, IUserAccessor userAccessor)
         {
             this.context = context;
             this.mapper = mapper;
+            this.userAccessor = userAccessor;
         }
 
         public async Task<bool> SaveActivity(Activity activity)
@@ -60,23 +63,18 @@ namespace Persistence
 
         public async Task<ActivityDto> GetActivity(Guid id)
         {
-            return await context.Activities
-                   .ProjectTo<ActivityDto>(mapper.ConfigurationProvider)
+            return await DtoMappedActivities()
                    .FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<List<ActivityDto>> ListActivities()
         {
-            return await context.Activities
-                .ProjectTo<ActivityDto>(mapper.ConfigurationProvider)
-                .ToListAsync();
+            return await DtoMappedActivities().ToListAsync();
         }
 
         public async Task<List<ActivityDto>> ListActivitiesForUser(string activeUsername)
         {
-            var result = await context.Activities
-               .ProjectTo<ActivityDto>(mapper.ConfigurationProvider)
-               .ToListAsync();
+            var result = await DtoMappedActivities().ToListAsync();
 
             foreach (var a in result)
             {
@@ -103,6 +101,13 @@ namespace Persistence
             return await context.Activities
                 .Include(a => a.Attendees).ThenInclude(u => u.AppUser)
                 .FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        private IQueryable<ActivityDto> DtoMappedActivities()
+        {
+            return context.Activities
+                               .ProjectTo<ActivityDto>(mapper.ConfigurationProvider,
+                                    new { currentUsername = userAccessor.GetUsername() });
         }
     }
 }

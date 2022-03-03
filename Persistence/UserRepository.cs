@@ -41,7 +41,8 @@ namespace Persistence
 
         public async Task<ProfileDto> GetProfile(string username)
         {
-            var user = await context.Users.ProjectTo<ProfileDto>(mapper.ConfigurationProvider)
+            var user = await context.Users.ProjectTo<ProfileDto>(mapper.ConfigurationProvider,
+                CreateUserConfig())
             .SingleOrDefaultAsync(x => x.Username == username);
 
             return user;
@@ -81,24 +82,27 @@ namespace Persistence
             return await context.SaveChangesAsync() > 0;
         }
 
-        public async Task<List<ProfileDto>> GetFollowingProfiles(string userName) {
+        public async Task<List<ProfileDto>> GetFollowingProfiles(string userName)
+        {
             return await context.UserFollowings
             .Where(x => x.Observer.UserName == userName)
-            .Select(u => u.Target).ProjectTo<ProfileDto>(mapper.ConfigurationProvider)
+            .Select(u => u.Target).ProjectTo<ProfileDto>(mapper.ConfigurationProvider, CreateUserConfig())
             .ToListAsync();
         }
 
-        public async Task<List<ProfileDto>> GetFollowerProfiles(string userName) {
+        public async Task<List<ProfileDto>> GetFollowerProfiles(string userName)
+        {
             return await context.UserFollowings
             .Where(x => x.Target.UserName == userName)
-            .Select(u => u.Observer).ProjectTo<ProfileDto>(mapper.ConfigurationProvider)
+            .Select(u => u.Observer).ProjectTo<ProfileDto>(mapper.ConfigurationProvider, CreateUserConfig())
             .ToListAsync();
         }
 
-        public string GetActiveUsername()
-        {
-            return userAccessor.GetUsername();
-        }
+        private object CreateUserConfig() 
+        => new { currentUsername = userAccessor.GetUsername() };
+
+        public string GetActiveUsername() 
+        => userAccessor.GetUsername();
 
         public async Task<bool> Save(AppUser user)
         {

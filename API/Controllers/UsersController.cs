@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Application.Activities;
 using Domain;
+using DTO;
 using Mediators;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,14 +23,14 @@ namespace API.Controllers
             return await Process(new HostedActivities.ToggleActivityCanceledRequest { ActivityId = activityId, IsCancelled = activityDto.IsCancelled });
         }
 
-        [HttpGet("{username}/following")]
-        public async Task<IActionResult> GetFollowing(string username) {
-            return await Process(new Followings.ListFollowing{ Username = username});
+        [HttpGet("{id}/following")]
+        public async Task<ActionResult<List<ProfileDto>>> GetFollowing(string id) {
+            return await Process(new Followings.ListFollowing{ Username = id});
         }
 
-        [HttpGet("{username}/followers")]
-        public async Task<IActionResult> GetFollowers(string username) {
-            return await Process(new Followings.ListFollowers{ Username = username});
+        [HttpGet("{id}/followers")]
+        public async Task<ActionResult<List<ProfileDto>>> GetFollowers(string id) {
+            return await Process(new Followings.ListFollowers{ Username = id});
         }
     }
 }

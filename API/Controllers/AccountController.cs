@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -86,7 +87,7 @@ namespace API.Controllers
         public async Task<ActionResult<UserDto>> GetCurrentUser() 
         {
             var user = await UserManager.Users.Include(p => p.Photos).FirstOrDefaultAsync( p => p.Email == User.FindFirstValue(ClaimTypes.Email));
-            
+            if (user == null) return Unauthorized();
             return CreateUserDto(user);
         }
 
