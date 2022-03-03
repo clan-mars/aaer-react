@@ -12,7 +12,6 @@ namespace Mediators
 {
     public class Activities
     {
-
         public class Create : IRequest<Result<Unit>> { public Activity Activity { get; set; } }
         public class CreateHandler : UpdateHandler<Create>
         {
@@ -47,7 +46,7 @@ namespace Mediators
             }
         }
 
-        public class Edit : IRequest<Result<Unit>> { public Activity Activity { get; set; } }
+        public class Edit : IRequest<Result<Unit>> { public ActivityDto Activity { get; set; } }
 
         public class EditHandler : UpdateHandler<Edit>
         {
@@ -63,6 +62,7 @@ namespace Mediators
                 return await new Application.Activities.Edit(activityRepository).PerformEdit(request.Activity);
             }
         }
+
         public class ListUserActivities : IRequest<Result<List<ActivityDto>>> { public string Username { get; set; } }
 
         public class ListUserActivitiesHandler : IRequestHandler<ListUserActivities, Result<List<ActivityDto>>>

@@ -5,6 +5,7 @@ using System;
 using Microsoft.AspNetCore.Authorization;
 using Mediators;
 using API.Middleware;
+using Application.Activities;
 
 namespace API.Controllers
 {
@@ -24,7 +25,7 @@ namespace API.Controllers
 
         [Authorize(Policy = "IsActivityHost")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> EditActivity(Guid id, Activity activity)
+        public async Task<IActionResult> EditActivity(Guid id, ActivityDto activity)
         {
             activity.Id = id;
             return await Process(new Activities.Edit { Activity = activity });

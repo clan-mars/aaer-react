@@ -36,7 +36,8 @@ namespace Persistence
 
         public async Task<AppUser> GetActiveUserWithPhotos()
         {
-            return await context.Users.Include(p => p.Photos).FirstOrDefaultAsync(x => x.UserName == userAccessor.GetUsername());
+            return await context.Users.Include(p => p.Photos)
+            .FirstOrDefaultAsync(x => x.UserName == userAccessor.GetUsername());
         }
 
         public async Task<ProfileDto> GetProfile(string username)
