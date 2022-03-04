@@ -8,6 +8,9 @@ export default class ProfileStore {
     loadingProfile = false;
     uploading = false;
     loading = false;
+    loadingFollowings = false;
+    followings: Profile[] = [];
+    followers: Profile[] = [];
 
     constructor() {
         makeAutoObservable(this);
@@ -25,14 +28,42 @@ export default class ProfileStore {
         this.loadingProfile = true;
         try {
             const profile = await agent.Profiles.get(username);
-            profile.followers = await agent.Profiles.getFollowers(username);
-            profile.followings = await agent.Profiles.getFollowing(username);
             runInAction(() => {
                 this.profile = profile;
                 this.loadingProfile = false;
             })
         } catch (error) {
             console.log("failed to get profile " + username);
+            console.log(error);
+            runInAction(() => this.loadingProfile = false);
+        }
+    }
+
+    loadFollowings = async () => {
+        this.loadingFollowings = true;
+        try {
+            const followings = await agent.Profiles.getFollowing(this.profile!.username);
+            runInAction(() => {
+                this.profile!.followings = followings;
+                this.loadingFollowings = false;
+            })
+        } catch (error) {
+            console.log("failed to get profile " + this.profile!.username);
+            console.log(error);
+            runInAction(() => this.loadingProfile = false);
+        }
+    }
+
+    loadFollowers = async () => {
+        this.loadingFollowings = true;
+        try {
+            const followers = await agent.Profiles.getFollowers(this.profile!.username);
+            runInAction(() => {
+                this.profile!.followers = followers;
+                this.loadingFollowings = false;
+            })
+        } catch (error) {
+            console.log("failed to get profile " + this.profile!.username);
             console.log(error);
             runInAction(() => this.loadingProfile = false);
         }
@@ -129,6 +160,50 @@ export default class ProfileStore {
                 this.loading = false;
             });
         }
+    }
 
+    updateFollowing = async (username: string, following:boolean) => {
+        this.loading = true;
+        try {
+            if (following) {
+                await agent.Profiles.follow(username);
+            } else {
+                await agent.Profiles.unfollow(username);
+            }
+            await store.activityStore.updateAttendeeFollowing(username);
+
+            runInAction(() => {
+                if (this.profile) {
+                    this.loadProfile(this.profile.username);
+                }
+
+                this.loading = false;
+            });
+
+        } catch (error) {
+            console.log(error);
+            runInAction(() => this.loading = false);
+        }
+    }
+
+    loadActivitiesForUser = async (username: string) => {
+        try {
+            this.loading = true;
+            const response = await agent.Activities.listForUser(username);
+
+            const list = await store.activityStore.loadActivitiesForUser(username); 
+
+            runInAction(() => {
+                if (this.profile) {
+                    this.profile.activities = list;
+                }
+
+                this.loading = false;
+            });
+
+        } catch (error) {
+            console.log(error);
+            runInAction(() => this.loading = false);
+        }
     }
 }

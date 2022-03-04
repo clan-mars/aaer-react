@@ -7,6 +7,9 @@ export interface Profile {
     image?: string;
     bio?: string;
     photos?: Photo[];
+    followersCount: number;
+    followingCount: number;
+    following: boolean;
     activities?: Activity[];
     followers: Profile[];
     followings: Profile[];

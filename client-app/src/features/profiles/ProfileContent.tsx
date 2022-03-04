@@ -5,19 +5,20 @@ import ProfileAbout from "./ProfileAbout";
 import ProfileEvents from "./ProfileEvents";
 import ProfileFollowing from "./ProfileFollowing";
 import ProfilePhotos from "./ProfilePhotos";
+import ProfileFollowers from "./ProfileFollowers";
 
 interface Props {
     profile: Profile;
 }
 
 export default observer(function ProfileContent({ profile }: Props) {
-    console.log(profile);
+    if (!profile) return <b>Loading</b>
     const panes = [
         { menuItem: 'About', render: () => <ProfileAbout /> },
         { menuItem: 'Photos', render: () => <ProfilePhotos profile={profile} /> },
         { menuItem: 'Events', render: () => <ProfileEvents profile={profile} /> },
-        { menuItem: 'Followers', render: () => <ProfileFollowing profiles={profile.followers}/> },
-        { menuItem: 'Following', render: () => <ProfileFollowing profiles={profile.followings}/> }
+        { menuItem: 'Followers', render: () => <ProfileFollowers /> },
+        { menuItem: 'Following', render: () => <ProfileFollowing /> }
     ]
 
     return (

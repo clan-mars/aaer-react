@@ -1,15 +1,23 @@
+import { observer } from "mobx-react-lite";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Item, Label, Tab, Image, Card } from "semantic-ui-react";
 import { Profile } from "../../app/models/profile";
+import { useStore } from "../../app/stores/store";
 
 interface Props {
     profile: Profile
 }
 
-export default function ProfileEvents({ profile }: Props) {
+export default observer(function ProfileEvents({ profile }: Props) {
+    const {profileStore} = useStore();
+    const { loadActivitiesForUser, loading} = profileStore;
+    useEffect(() => {
+        loadActivitiesForUser(profile.username);
+    }, [loadActivitiesForUser]);
 
     return (
-        <Tab.Pane>
+        <Tab.Pane loading={loading}>
             <Card.Group>
                 {
                     profile.activities!.map(activity => (
@@ -34,4 +42,4 @@ export default function ProfileEvents({ profile }: Props) {
             </Card.Group>
         </Tab.Pane>
     );
-}
+})

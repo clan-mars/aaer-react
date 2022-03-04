@@ -23,7 +23,7 @@ axios.interceptors.request.use(config => {
 
 axios.interceptors.response.use(async response => {
     try {
-        await sleep(1000 * Math.random());
+        await sleep(10 * Math.random());
         return response;
     } catch (error) {
         console.log("Sleep error: " + error);
@@ -107,7 +107,9 @@ const Profiles = {
     deletePhoto: (id:string) => requests.del(`/photos/${id}`),
     update: (profile:Profile) => requests.put(`/profiles/`, profile),
     getFollowers: (id:string) => requests.get<Profile[]>(`users/${id}/followers`),
-    getFollowing: (id:string) => requests.get<Profile[]>(`users/${id}/following`)
+    getFollowing: (id:string) => requests.get<Profile[]>(`users/${id}/following`),
+    follow: (id:string) => requests.post<void>(`/follow/${id}`, {}),
+    unfollow: (id:string) => requests.del<void>(`/follow/${id}`)
 }
 
 const agent = {

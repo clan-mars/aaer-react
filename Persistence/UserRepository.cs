@@ -100,7 +100,7 @@ namespace Persistence
         }
 
         private object CreateUserConfig() 
-        => new { currentUsername = userAccessor.GetUsername() };
+            => new { currentUsername = userAccessor.GetUsername() };
 
         public string GetActiveUsername() 
         => userAccessor.GetUsername();

@@ -11,7 +11,8 @@ export default observer(function ProfileAbout() {
     const { profileStore: { updateProfileContent, isCurrentUser, profile }, userStore, activityStore } = useStore();
 
     function handleFormSubmit(updatedProfile: Profile) {
-        updateProfileContent(updatedProfile).then(() => setEditMode(false)).then(()=> userStore.getUser()).then(()=> activityStore.loadActivitiesForUser(userStore.user?.username!));
+        updateProfileContent(updatedProfile).then(() => setEditMode(false)).then(()=> userStore.getUser())
+        .then(()=> activityStore.loadActivitiesForUser(userStore.user?.username!));
     }
 
     return (

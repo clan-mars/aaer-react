@@ -3,17 +3,17 @@ import { useEffect } from "react";
 import { useStore } from "../../app/stores/store";
 import ProfileGrid from "./ProfileGrid";
 
-export default observer(function ProfileFollowings() {
+export default observer(function ProfileFollowers() {
     const { profileStore } = useStore();
-    const { loadFollowings, loadingFollowings, profile } = profileStore;
+    const { loadFollowers: loadFollowers, loadingFollowings, profile } = profileStore;
 
     useEffect(() => {
-        loadFollowings();
-    }, [loadFollowings]);
+        loadFollowers();
+    }, [loadFollowers]);
 
     return <ProfileGrid 
-            profiles={profile!.followings} 
+            profiles={profile!.followers} 
             profile={profile} 
             loading={loadingFollowings} 
-            text={`People ${profile!.displayName} follows`} />
+            text={`People following ${profile?.displayName}`} />
 });

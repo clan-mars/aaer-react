@@ -18,6 +18,7 @@ export default class ActivityStore {
     editMode = false;
     loading = false;
     loadingInitial = false;
+    userActivities : Activity[] = [];
     currentState: ActivityState = {
         editMode : false,
         loading : false,
@@ -72,7 +73,8 @@ export default class ActivityStore {
                 this.addActivity(activity);
             });
             this.setLoadingInitial(false)
-
+            
+            return response;
 
         } catch (error) {
             console.log(error);
@@ -279,6 +281,10 @@ export default class ActivityStore {
 
     clearSelectedActivity = () => {
         this.selectedActivity = undefined;
+    }
+
+    updateAttendeeFollowing = async (username:string) => {
+        await this.loadActivitiesForUser(store.userStore.user?.username+"");
     }
 
 }

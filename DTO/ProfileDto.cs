@@ -13,6 +13,6 @@ namespace DTO
         public int FollowersCount { get; set; }
         public int FollowingCount { get; set; }
         public ICollection<PhotoDto> Photos {get;set;}
-        public ICollection<ActivityDto> Activities {get;set;}
+        public ICollection<AttendeeDto> Activities {get;set;}
     }
 }
