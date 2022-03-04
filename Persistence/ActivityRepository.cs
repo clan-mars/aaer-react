@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using Application.Interfaces;
 using DTO;
 using Persistence.Interfaces;
+using Application.Core;
 
 namespace Persistence
 {
@@ -92,15 +93,10 @@ namespace Persistence
             return result;
         }
 
-        public async Task<List<ActivityDto>> ListActivities()
+        public async Task<PagedList<ActivityDto>> ListActivities(PagingParams pagingParams)
         {
-            var result = await DtoMappedActivities().ToListAsync();
-            foreach (var a in result)
-            {
-                a.Host = a.Attendees.SingleOrDefault(ac => ac.Username == a.HostUsername);
-            }
-
-            return result;
+            var result = DtoMappedActivities().OrderBy(d => d.Date).AsQueryable();
+            return await PagedList<ActivityDto>.CreateAsync(result, pagingParams.PageNumber, pagingParams.PageSize);
         }
 
         public async Task<List<ActivityDto>> ListActivitiesForUser(string activeUsername)

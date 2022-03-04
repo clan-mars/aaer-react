@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using API.Extensions;
 using Application.Core;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -18,15 +19,41 @@ namespace API.Controllers
             return HandleResult(await Mediator.Send(request));
         }
 
+        protected async Task<ActionResult> Process<T>(IRequest<Result<PagedList<T>>> request)
+        {
+            return HandlePagedResult(await Mediator.Send(request));
+        }
+
         protected ActionResult HandleResult<T>(Result<T> result)
         {
             if (result == null)
             {
                 return NotFound();
             }
+
             if (result.IsSuccess)
             {
                 return result.Value == null ? NotFound() : Ok(result.Value);
+            }
+
+            return BadRequest(result.Error);
+        }
+
+        protected ActionResult HandlePagedResult<T>(Result<PagedList<T>> result)
+        {
+            if (result == null)
+            {
+                return NotFound();
+            }
+            
+            if (result.IsSuccess)
+            {
+                if (result.Value == null) return NotFound();
+
+                Response.AddPaginationHeader(result.Value.CurrentPage, 
+                result.Value.PageSize, result.Value.TotalCount, result.Value.TotalPages);
+                
+                return Ok(result.Value);
             }
 
             return BadRequest(result.Error);

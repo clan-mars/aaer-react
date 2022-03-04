@@ -16,8 +16,8 @@ namespace Application.Activities
             this.activityRepository = activityRepository;
         }
 
-        public async Task<List<ActivityDto>> GetList() {
-            return await activityRepository.ListActivities();
+        public async Task<PagedList<ActivityDto>> GetList(PagingParams pagingParams) {
+            return await activityRepository.ListActivities(pagingParams);
         }
     }
 }

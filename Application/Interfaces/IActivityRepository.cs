@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Domain;
 using Application.Activities;
 using System.Collections.Generic;
+using Application.Core;
 
 namespace Application.Interfaces
 {
@@ -12,7 +13,7 @@ namespace Application.Interfaces
         Task<ActivityDto> GetActivity(Guid id, string activeUsername);
         Task<ActivityDto> GetActivity(Guid id);
         Task<Activity> GetRealActivity(Guid id);
-        Task<List<ActivityDto>> ListActivities();
+        Task<PagedList<ActivityDto>> ListActivities(PagingParams pagingParams);
         Task<List<ActivityDto>> ListActivitiesForUser(string activeUsername);
         Task<bool> PlainSave();
         Task<bool> SaveActivity(Activity activity);

@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from "axios";
-import { Pagination } from "../models/Pagination";
+import { ReleasePagination } from "../models/ReleasePagination";
 
 const baseURL = 'https://api.discogs.com/database/search?';
 axios.defaults.headers['Authorization'] = "Discogs token=mXkQzOGFjFqeXHcpRKqmUDznVJdKLUPQvPVyIdQm";
@@ -11,7 +11,7 @@ const requests = {
 }
 
 const Queries = {
-    Albums: (artist:string) => requests.get<Pagination>(`${baseURL}artist=${artist}&type=master&format=album`)
+    Albums: (artist:string) => requests.get<ReleasePagination>(`${baseURL}artist=${artist}&type=master&format=album`)
 }
 
 const discogs = { Queries}

@@ -10,9 +10,7 @@ namespace Application.Activities
 {
 
     public class ListActivitiesForUser
-    {
-        
-
+    {      
         private readonly IActivityRepository activityRepository;
 
         public ListActivitiesForUser( IActivityRepository activityRepository)

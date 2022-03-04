@@ -106,9 +106,12 @@ namespace Mediators
             }
         }
 
-        public class ActivityList : IRequest<Result<List<ActivityDto>>> { }
+        public class ActivityList : IRequest<Result<PagedList<ActivityDto>>>
+        {
+            public PagingParams PagingParams { get; set; }
+        }
 
-        public class ListHandler : IRequestHandler<ActivityList, Result<List<ActivityDto>>>
+        public class ListHandler : IRequestHandler<ActivityList, Result<PagedList<ActivityDto>>>
         {
             private readonly IActivityRepository activityRepository;
 
@@ -116,11 +119,11 @@ namespace Mediators
             {
                 this.activityRepository = activityRepository;
             }
-            public async Task<Result<List<ActivityDto>>> Handle(ActivityList request, CancellationToken cancellationToken)
+            public async Task<Result<PagedList<ActivityDto>>> Handle(ActivityList request, CancellationToken cancellationToken)
             {
-                var result = await new Application.Activities.List(activityRepository).GetList();
+                var result = await new Application.Activities.List(activityRepository).GetList(request.PagingParams);
 
-                return Result<List<ActivityDto>>.Success(result);
+                return Result<PagedList<ActivityDto>>.Success(result);
             }
         }
 

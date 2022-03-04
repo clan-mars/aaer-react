@@ -2,6 +2,7 @@ import { format } from "date-fns";
 import { makeAutoObservable, runInAction } from "mobx"
 import agent from "../api/agent";
 import { Activity, ActivityFormValues } from "../models/Activity";
+import { Pagination, PagingParams } from "../models/pagination";
 import { Profile } from "../models/profile";
 import { store } from "./store";
 
@@ -19,6 +20,9 @@ export default class ActivityStore {
     loading = false;
     loadingInitial = false;
     userActivities : Activity[] = [];
+    pagination: Pagination | null = null;
+    pagingParams = new PagingParams();
+
     currentState: ActivityState = {
         editMode : false,
         loading : false,
@@ -30,10 +34,22 @@ export default class ActivityStore {
         makeAutoObservable(this)
     }
 
+    setPagingParams = (pagingParams: PagingParams) => {
+        this.pagingParams = pagingParams;
+    }
+
     get activitiesByDate() {
         return Array.from(this.activityRegistry.values()).sort(
             (a, b) => a.date!.getTime() - b.date!.getTime()
         );
+    }
+
+    get axiosParams() {
+        const params = new URLSearchParams();
+        params.append('pageNumber', this.pagingParams.pageNumber.toString());
+        params.append('pageSize', this.pagingParams.pageSize.toString());
+
+        return params;
     }
 
     get groupedActivities() {
@@ -50,11 +66,12 @@ export default class ActivityStore {
         try {
             this.activityRegistry.clear();
             this.setLoadingInitial(true);
-            const response = await agent.Activities.list()
+            const response = await agent.Activities.list(this.axiosParams)
 
-            response.forEach(activity => {
+            response.data.forEach(activity => {
                 this.addActivity(activity);
             });
+            this.setPagination(response.pagination);
             this.setLoadingInitial(false)
 
         } catch (error) {
@@ -63,8 +80,13 @@ export default class ActivityStore {
         }
     }
 
+    setPagination = (pagination: Pagination) => {
+        this.pagination = pagination;
+    }
+
     private addActivity = (activity: Activity) => {
         activity.date = new Date(activity.date!);
+        activity.host = activity.attendees.find(o => o.username == activity.hostUsername);
         this.activityRegistry.set(activity.id, activity);
     }
 
@@ -73,20 +95,9 @@ export default class ActivityStore {
     }
 
     loadActivity = async (id: string) => {
-        let activity = this.getActivity(id);
-        if (false && activity) {
-            runInAction(() => {
-                this.selectedActivity = activity;
-                this.currentState.selectedActivity = activity;
-            });
-
-            this.setLoadingInitial(false);
-            return activity;
-        }
-
         this.setLoadingInitial(true);
         try {
-            activity = await agent.Activities.details(id);
+            let activity = await agent.Activities.details(id);
             this.addActivity(activity);
             runInAction(() => {
                 this.selectedActivity = activity;
