@@ -23,7 +23,7 @@ axios.interceptors.request.use(config => {
 
 axios.interceptors.response.use(async response => {
     try {
-        await sleep(10 * Math.random());
+        await sleep(1000 * Math.random());
         return response;
     } catch (error) {
         console.log("Sleep error: " + error);

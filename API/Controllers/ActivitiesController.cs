@@ -11,6 +11,12 @@ namespace API.Controllers
 {
     public class ActivitiesController : BaseApiController
     {
+        [HttpGet]
+        public async Task<IActionResult> GetActivities()
+        {
+            return await Process(new Activities.ActivityList());
+        }
+        
         [HttpGet("{id}")]
         public async Task<IActionResult> GetActivity(Guid id)
         {

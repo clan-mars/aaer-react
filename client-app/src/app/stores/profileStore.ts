@@ -190,12 +190,9 @@ export default class ProfileStore {
         try {
             this.loading = true;
             const response = await agent.Activities.listForUser(username);
-
-            const list = await store.activityStore.loadActivitiesForUser(username); 
-
             runInAction(() => {
                 if (this.profile) {
-                    this.profile.activities = list;
+                    this.profile.activities = response;
                 }
 
                 this.loading = false;

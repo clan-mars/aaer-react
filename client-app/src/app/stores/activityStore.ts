@@ -46,35 +46,16 @@ export default class ActivityStore {
         )
     }
 
-    loadActivities = async () => {
+    loadActivities = async (username:string) => {
         try {
+            this.activityRegistry.clear();
             this.setLoadingInitial(true);
-            const response = await agent.Activities.list();
+            const response = await agent.Activities.list()
 
             response.forEach(activity => {
                 this.addActivity(activity);
             });
             this.setLoadingInitial(false)
-
-
-        } catch (error) {
-            console.log(error);
-            this.setLoadingInitial(false)
-        }
-    }
-
-    loadActivitiesForUser = async (username: string) => {
-        try {
-            this.setLoadingInitial(true);
-            const response = await agent.Activities.listForUser(username);
-
-            response.forEach(activity => {
-                activity.date = new Date(activity.date!);
-                this.addActivity(activity);
-            });
-            this.setLoadingInitial(false)
-            
-            return response;
 
         } catch (error) {
             console.log(error);
@@ -93,7 +74,7 @@ export default class ActivityStore {
 
     loadActivity = async (id: string) => {
         let activity = this.getActivity(id);
-        if (activity) {
+        if (false && activity) {
             runInAction(() => {
                 this.selectedActivity = activity;
                 this.currentState.selectedActivity = activity;
@@ -284,8 +265,7 @@ export default class ActivityStore {
     }
 
     updateAttendeeFollowing = async (username:string) => {
-        await this.loadActivitiesForUser(store.userStore.user?.username+"");
+        await this.loadActivities(username);
     }
-
 }
 

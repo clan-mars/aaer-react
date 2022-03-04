@@ -84,13 +84,23 @@ namespace Persistence
 
         public async Task<ActivityDto> GetActivity(Guid id)
         {
-            return await DtoMappedActivities()
+            var result =  await DtoMappedActivities()
                    .FirstOrDefaultAsync(x => x.Id == id);
+
+            result.Host = result.Attendees.SingleOrDefault(ac => ac.Username == result.HostUsername);
+            
+            return result;
         }
 
         public async Task<List<ActivityDto>> ListActivities()
         {
-            return await DtoMappedActivities().ToListAsync();
+            var result = await DtoMappedActivities().ToListAsync();
+            foreach (var a in result)
+            {
+                a.Host = a.Attendees.SingleOrDefault(ac => ac.Username == a.HostUsername);
+            }
+
+            return result;
         }
 
         public async Task<List<ActivityDto>> ListActivitiesForUser(string activeUsername)
