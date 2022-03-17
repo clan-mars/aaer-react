@@ -5,7 +5,7 @@ import ProfileGrid from "./ProfileGrid";
 
 export default observer(function ProfileFollowers() {
     const { profileStore } = useStore();
-    const { loadFollowers: loadFollowers, loadingFollowings, profile } = profileStore;
+    const { loadFollowers, loadingFollowings, profile } = profileStore;
 
     useEffect(() => {
         loadFollowers();

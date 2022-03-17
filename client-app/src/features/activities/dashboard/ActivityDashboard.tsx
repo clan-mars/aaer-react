@@ -15,10 +15,9 @@ export default observer (function ActivityDashboard() {
     useEffect(() => {
       if (activityRegistry.size <= 1) 
         loadActivities(user?.username+"");
-    }, [activityRegistry.size, loadActivities]);
+    }, [activityRegistry.size, loadActivities, user?.username]);
   
       if (activityStore.loadingInitial) return <LoadingComponent content="Loading activities..." />
-
 
     return (
         <Grid>

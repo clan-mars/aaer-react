@@ -8,7 +8,7 @@ import ProfileForm from "./form/ProfileForm";
 
 export default observer(function ProfileAbout() {
     const [editMode, setEditMode] = useState(false);
-    const { profileStore: { updateProfileContent, loadActivitiesForUser, isCurrentUser, profile }, userStore, activityStore } = useStore();
+    const { profileStore: { updateProfileContent, loadActivitiesForUser, isCurrentUser, profile }, userStore } = useStore();
 
     function handleFormSubmit(updatedProfile: Profile) {
         updateProfileContent(updatedProfile).then(() => setEditMode(false)).then(()=> userStore.getUser())

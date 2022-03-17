@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Item, Label, Tab, Image, Card } from "semantic-ui-react";
+import { Label, Tab, Image, Card } from "semantic-ui-react";
 import { Profile } from "../../app/models/profile";
 import { useStore } from "../../app/stores/store";
 
@@ -14,7 +14,7 @@ export default observer(function ProfileEvents({ profile }: Props) {
     const { loadActivitiesForUser, loading} = profileStore;
     useEffect(() => {
         loadActivitiesForUser(profile.username);
-    }, [loadActivitiesForUser]);
+    }, [loadActivitiesForUser, profile.username]);
 
     return (
         <Tab.Pane loading={loading}>

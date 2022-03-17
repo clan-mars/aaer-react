@@ -6,13 +6,6 @@ import { Pagination, PagingParams } from "../models/pagination";
 import { Profile } from "../models/profile";
 import { store } from "./store";
 
-interface ActivityState {
-    loading: boolean;
-    loadingInitial: boolean;
-    editMode: boolean;
-    selectedActivity: Activity | undefined;
-}
-
 export default class ActivityStore {
     activityRegistry = new Map<string, Activity>();
     selectedActivity: Activity | undefined = undefined;
@@ -79,7 +72,7 @@ export default class ActivityStore {
 
     private addActivity = (activity: Activity) => {
         activity.date = new Date(activity.date!);
-        activity.host = activity.attendees.find(o => o.username == activity.hostUsername);
+        activity.host = activity.attendees.find(o => o.username === activity.hostUsername);
         this.activityRegistry.set(activity.id, activity);
     }
 
