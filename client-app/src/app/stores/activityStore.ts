@@ -23,13 +23,6 @@ export default class ActivityStore {
     pagination: Pagination | null = null;
     pagingParams = new PagingParams();
 
-    currentState: ActivityState = {
-        editMode : false,
-        loading : false,
-        loadingInitial : false,
-        selectedActivity : undefined
-    };
-
     constructor() {
         makeAutoObservable(this)
     }
@@ -101,7 +94,6 @@ export default class ActivityStore {
             this.addActivity(activity);
             runInAction(() => {
                 this.selectedActivity = activity;
-                this.currentState.selectedActivity = activity;
             });
             this.setLoadingInitial(false);
             return activity;
@@ -129,20 +121,17 @@ export default class ActivityStore {
 
     updateCancelled = async (isCancelled: boolean) => {
         if (this.selectedActivity!.isCancelled === isCancelled) return;
-        if (this.currentState.selectedActivity!.isCancelled === isCancelled) return;
 
         this.loading = true;
         try {
             const user = store.userStore.user;
             this.selectedActivity!.isCancelled = isCancelled;
-            this.currentState.selectedActivity!.isCancelled = isCancelled;
             await agent.Activities.updateHosted(user!.username, this.selectedActivity!);
             var updatedActivity = await agent.Activities.details(this.selectedActivity!.id);
             updatedActivity.date = new Date(updatedActivity.date!);
             runInAction(() => {
                 this.activityRegistry.set(updatedActivity.id, updatedActivity);
                 this.selectedActivity = updatedActivity;
-                this.currentState.selectedActivity = updatedActivity;
             })
 
         } catch (error) {
@@ -161,8 +150,6 @@ export default class ActivityStore {
             runInAction(() => {
                 this.activityRegistry.set(updatedActivity.id, updatedActivity);
                 this.selectedActivity = updatedActivity;
-                this.currentState.selectedActivity = updatedActivity;
-                this.currentState.loading = false;
                 this.loading = false;
             })
 
@@ -179,7 +166,7 @@ export default class ActivityStore {
         try {
             await agent.Activities.attend(this.selectedActivity!.id);
             runInAction(() => {
-                let activity = this.currentState.selectedActivity;
+                let activity = this.selectedActivity;
                 if (activity?.isGoing) {
                     activity.attendees = activity.attendees?.filter(a => a.username !== user?.username);
                     activity.isGoing = false;
@@ -197,13 +184,11 @@ export default class ActivityStore {
         } finally {
             runInAction(() => {
                 this.loading = false;
-                this.currentState.loading = false;
             });
         }
     }
 
     setLoadingInitial = (state: boolean) => {
-        this.currentState.loadingInitial = state;
         this.loadingInitial = state;
     }
 
@@ -222,14 +207,11 @@ export default class ActivityStore {
             runInAction(() => {
                 this.selectedActivity = newActivity;
                 this.loading = false;
-                this.currentState.selectedActivity = newActivity;
-                this.currentState.loading = false;
             })
         } catch (error) {
             console.log(error);
             runInAction(() => {
                 this.loading = false;
-                this.currentState.loading = false;
             })
         }
     }
@@ -248,7 +230,6 @@ export default class ActivityStore {
             console.log(error);
             runInAction(() => {
                 this.loading = false;
-                this.currentState.loading = false;
             })
         }
     }
@@ -260,13 +241,11 @@ export default class ActivityStore {
             runInAction(() => {
                 this.activityRegistry.delete(id);
                 this.loading = false;
-                this.currentState.loading = false;
             })
         } catch (error) {
             console.log(error);
             runInAction(() => {
                 this.loading = false;
-                this.currentState.loading = false;
             })
         }
     }
