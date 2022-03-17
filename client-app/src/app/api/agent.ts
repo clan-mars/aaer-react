@@ -1,6 +1,7 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 
 import { toast } from "react-toastify";
+import { URLSearchParams } from "url";
 import { history } from "../..";
 import { Activity, ActivityFormValues } from "../models/Activity";
 import { PaginatedResult } from "../models/pagination";
@@ -78,14 +79,14 @@ const responseBody = <T>(response: AxiosResponse<T>) => response.data;
 
 const requests = {
     get: <T>(url: string) => axios.get<T>(url).then(responseBody),
+    getPaginated: <T>(url: string, params: URLSearchParams) => axios.get<T>(url, {params}).then(responseBody),
     post: <T>(url: string, body: {}) => axios.post<T>(url, body).then(responseBody),
     put: <T>(url: string, body: {}) => axios.put<T>(url, body).then(responseBody),
     del: <T>(url: string) => axios.delete<T>(url).then(responseBody),
 }
 
 const Activities = {
-    list: (params: URLSearchParams) => axios.get<PaginatedResult<Activity[]>>('/activities', {params})
-        .then(responseBody),
+    list: (params: URLSearchParams) => requests.getPaginated<PaginatedResult<Activity[]>>('/activities', params),
     listForUser: (id: string) => requests.get<Activity[]>(`/users/${id}/activities`),
     details: (id: string) => requests.get<Activity>(`/activities/${id}`),
     create: (activity: ActivityFormValues) => requests.post('/activities', activity),

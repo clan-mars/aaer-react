@@ -8,7 +8,6 @@ using Application.Activities;
 using System.Linq;
 using System.Collections.Generic;
 using Application.Interfaces;
-using DTO;
 using Persistence.Interfaces;
 using Application.Core;
 
