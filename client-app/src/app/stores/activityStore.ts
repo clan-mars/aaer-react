@@ -89,6 +89,7 @@ export default class ActivityStore {
                 this.selectedActivity = activity;
             });
             this.setLoadingInitial(false);
+            
             return activity;
         } catch (error) {
             console.log(error);
@@ -158,6 +159,7 @@ export default class ActivityStore {
         this.loading = true;
         try {
             await agent.Activities.attend(this.selectedActivity!.id);
+            //TODO: FIX!
             runInAction(() => {
                 let activity = this.selectedActivity;
                 if (activity?.isGoing) {

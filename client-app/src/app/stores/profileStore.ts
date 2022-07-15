@@ -142,9 +142,7 @@ export default class ProfileStore {
             if (this.profile) {
                 const refreshedProfile = await agent.Profiles.get(this.profile.username);
                 runInAction(() => {
-                    if (this.profile) {
-                        this.profile = refreshedProfile;
-                    }
+                    this.profile = refreshedProfile;
                     this.loading = false;
                 });
             } else {
@@ -152,8 +150,6 @@ export default class ProfileStore {
                     this.loading = false;
                 });
             }
-
-
         } catch (error) {
             console.log(error);
             runInAction(() => {
